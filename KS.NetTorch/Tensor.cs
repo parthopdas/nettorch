@@ -4,19 +4,6 @@ namespace KS.NetTorch
     using KS.NetTorch.Operations;
     using MathNet.Numerics.LinearAlgebra;
 
-    public static class MatrixExtensions
-    {
-        public static Matrix<double> ToMatrix(this double d)
-        {
-            return Matrix<double>.Build.Dense(1, 1, d);
-        }
-
-        public static Matrix<double> ToMatrix(this int i)
-        {
-            return Matrix<double>.Build.Dense(1, 1, i);
-        }
-    }
-
     [DebuggerDisplay("Rank 2: {Data.RowCount}x{Data.ColumnCount}")]
     public sealed class Tensor
     {
@@ -29,27 +16,27 @@ namespace KS.NetTorch
         public bool IsLeaf { get; private set; }
 
 
-        public bool RequiresGradient { get; private set; }
+        public bool TracksGradient { get; private set; }
 
-        public Tensor(double data, bool requiresGradient = false)
-            : this(new[] { data }, requiresGradient)
+        public Tensor(double data, bool tracksGradient = false)
+            : this(new[] { data }, tracksGradient)
         {
         }
 
-        public Tensor(double[] data, bool requiresGradient = false)
-            : this(Matrix<double>.Build.DenseOfColumnArrays(data), requiresGradient)
+        public Tensor(double[] data, bool tracksGradient = false)
+            : this(Matrix<double>.Build.DenseOfColumnArrays(data), tracksGradient)
         {
         }
 
-        public Tensor(Matrix<double> data, bool requiresGradient = false)
+        public Tensor(Matrix<double> data, bool tracksGradient = false)
         {
             Data = data;
             Gradient = Matrix<double>.Build.Dense(data.RowCount, data.ColumnCount, 0);
-            GradientFunction = requiresGradient
+            GradientFunction = tracksGradient
                 ? new AccumulateGradientFunction(this) as IGradientFunction
                 : new NullGradientFunction();
             IsLeaf = true;
-            RequiresGradient = requiresGradient;
+            TracksGradient = tracksGradient;
         }
 
         public void AccumulateGradient_(Matrix<double> delta)
@@ -61,23 +48,23 @@ namespace KS.NetTorch
 
         public static Tensor operator *(Tensor t1, Tensor t2)
         {
-            var requiresGradient = t1.RequiresGradient || t2.RequiresGradient;
+            var tracksGradient = t1.TracksGradient || t2.TracksGradient;
 
-            var gradientFunction = requiresGradient
-                ? (IGradientFunction)new MultiplyBackwardGradientFunction(new Context().SaveForBackward(t1, t2))
+            var gradientFunction = tracksGradient
+                ? (IGradientFunction)new MultiplyOperation(new Context().SaveForBackward(t1, t2))
                 : new NullGradientFunction();
 
-            return new Tensor(t1.Data * t2.Data)
+            return new Tensor(MultiplyOperation.ExecuteForward(t1.Data, t2.Data))
             {
-                IsLeaf = !requiresGradient,
-                RequiresGradient = requiresGradient,
+                IsLeaf = !tracksGradient,
+                TracksGradient = tracksGradient,
                 GradientFunction = gradientFunction,
             };
         }
 
         public void Backward(double initialGradient = 1.0)
         {
-            GradientFunction.Execute(Matrix<double>.Build.Dense(1, 1, initialGradient));
+            GradientFunction.ExecuteBackward(Matrix<double>.Build.Dense(1, 1, initialGradient));
         }
     }
 }

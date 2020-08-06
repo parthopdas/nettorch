@@ -11,7 +11,7 @@ namespace KS.NetTorch.Operations
             _tensor = tensor;
         }
 
-        public void Execute(Matrix<double> initialGradient)
+        public void ExecuteBackward(Matrix<double> initialGradient)
         {
             _tensor.AccumulateGradient_(initialGradient);
         }

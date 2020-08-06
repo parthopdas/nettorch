@@ -4,7 +4,7 @@ namespace KS.NetTorch.Operations
 
     public sealed class NullGradientFunction : IGradientFunction
     {
-        public void Execute(Matrix<double> _)
+        public void ExecuteBackward(Matrix<double> _)
         {
         }
     }

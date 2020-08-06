@@ -4,6 +4,6 @@ namespace KS.NetTorch.Operations
 
     public interface IGradientFunction
     {
-        void Execute(Matrix<double> initialGradient);
+        void ExecuteBackward(Matrix<double> initialGradient);
     }
 }

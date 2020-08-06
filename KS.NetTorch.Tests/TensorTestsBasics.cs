@@ -2,6 +2,7 @@ namespace KS.NetTorch.Tests
 {
     using FluentAssertions;
     using KS.NetTorch.Operations;
+    using KS.NetTorch.Tests.Extensions;
     using MathNet.Numerics;
     using MathNet.Numerics.LinearAlgebra;
     using Xunit;
@@ -15,10 +16,7 @@ namespace KS.NetTorch.Tests
         {
             var a = new Tensor(2);
 
-            a.Gradient.AlmostEqual(Zero1x1, LibConstants.Epsilon).Should().BeTrue();
-            a.GradientFunction.Should().BeOfType<NullGradientFunction>();
-            a.IsLeaf.Should().BeTrue();
-            a.RequiresGradient.Should().BeFalse();
+            a.Should().HaveProperties(2.ToMatrix(), Zero1x1, typeof(NullGradientFunction), isLeaf: true, tracksGradient: false);
             a.ToString().Should().Be(@"DenseMatrix 1x1-Double
 2
 ");
@@ -27,13 +25,9 @@ namespace KS.NetTorch.Tests
         [Fact]
         public void CreateATensorWithGradientTracking()
         {
-            var a = new Tensor(2, requiresGradient: true);
+            var a = new Tensor(2, tracksGradient: true);
 
-            a.Data.AlmostEqual(2.ToMatrix(), LibConstants.Epsilon).Should().BeTrue();
-            a.Gradient.AlmostEqual(Zero1x1, LibConstants.Epsilon).Should().BeTrue();
-            a.GradientFunction.Should().BeOfType<AccumulateGradientFunction>();
-            a.IsLeaf.Should().BeTrue();
-            a.RequiresGradient.Should().BeTrue();
+            a.Should().HaveProperties(2.ToMatrix(), Zero1x1, typeof(AccumulateGradientFunction), isLeaf: true, tracksGradient: true);
         }
 
         [Fact]
@@ -44,26 +38,18 @@ namespace KS.NetTorch.Tests
 
             var c = a * b;
 
-            c.Data.AlmostEqual(6.ToMatrix(), LibConstants.Epsilon).Should().BeTrue();
-            c.Gradient.AlmostEqual(Zero1x1, LibConstants.Epsilon).Should().BeTrue();
-            c.GradientFunction.Should().BeOfType<NullGradientFunction>();
-            c.IsLeaf.Should().BeTrue();
-            c.RequiresGradient.Should().BeFalse();
+            c.Should().HaveProperties(6.ToMatrix(), Zero1x1, typeof(NullGradientFunction), isLeaf: true, tracksGradient: false);
         }
 
         [Fact]
         public void Multiply2UserCreatedTensorsOneOfThemTracksGradient()
         {
-            var a = new Tensor(2, requiresGradient: true);
+            var a = new Tensor(2, tracksGradient: true);
             var b = new Tensor(3);
 
             var c = a * b;
 
-            c.Data.AlmostEqual(6.ToMatrix(), LibConstants.Epsilon).Should().BeTrue();
-            c.Gradient.AlmostEqual(Zero1x1, LibConstants.Epsilon).Should().BeTrue();
-            c.GradientFunction.Should().BeOfType<MultiplyBackwardGradientFunction>();
-            c.IsLeaf.Should().BeFalse();
-            c.RequiresGradient.Should().BeTrue();
+            c.Should().HaveProperties(6.ToMatrix(), Zero1x1, typeof(MultiplyOperation), isLeaf: false, tracksGradient: true);
         }
     }
 }
