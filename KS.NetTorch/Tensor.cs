@@ -1,5 +1,6 @@
 namespace KS.NetTorch
 {
+    using System;
     using System.Diagnostics;
     using KS.NetTorch.Operations;
     using MathNet.Numerics.LinearAlgebra;
@@ -19,12 +20,17 @@ namespace KS.NetTorch
         public bool TracksGradient { get; private set; }
 
         public Tensor(double data, bool tracksGradient = false)
-            : this(new[] { data }, tracksGradient)
+            : this(data.ToMatrix(), tracksGradient)
         {
         }
 
         public Tensor(double[] data, bool tracksGradient = false)
-            : this(Matrix<double>.Build.DenseOfColumnArrays(data), tracksGradient)
+            : this(data.ToMatrix(), tracksGradient)
+        {
+        }
+
+        public Tensor(double[,] data, bool tracksGradient = false)
+            : this(data.ToMatrix(), tracksGradient)
         {
         }
 
@@ -46,25 +52,40 @@ namespace KS.NetTorch
 
         public override string ToString() => Data.ToString();
 
+        public void Backward(double initialGradient = 1.0)
+        {
+            Backward(Matrix<double>.Build.Dense(1, 1, initialGradient));
+        }
+
+        public void Backward(Matrix<double> initialGradient)
+        {
+            GradientFunction.ExecuteBackward(initialGradient);
+        }
+
+        public static Tensor operator *(double d, Tensor t1)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Tensor operator *(Tensor t1, double d)
+        {
+            throw new NotImplementedException();
+        }
+
         public static Tensor operator *(Tensor t1, Tensor t2)
         {
             var tracksGradient = t1.TracksGradient || t2.TracksGradient;
 
             var gradientFunction = tracksGradient
-                ? (IGradientFunction)new MultiplyOperation(new Context().SaveForBackward(t1, t2))
+                ? (IGradientFunction)new PointwiseMultiplyOperation(new Context().SaveForBackward(t1, t2))
                 : new NullGradientFunction();
 
-            return new Tensor(MultiplyOperation.ExecuteForward(t1.Data, t2.Data))
+            return new Tensor(PointwiseMultiplyOperation.ExecuteForward(t1.Data, t2.Data))
             {
                 IsLeaf = !tracksGradient,
                 TracksGradient = tracksGradient,
                 GradientFunction = gradientFunction,
             };
-        }
-
-        public void Backward(double initialGradient = 1.0)
-        {
-            GradientFunction.ExecuteBackward(Matrix<double>.Build.Dense(1, 1, initialGradient));
         }
     }
 }

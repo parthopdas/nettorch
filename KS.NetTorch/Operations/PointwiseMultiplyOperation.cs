@@ -3,13 +3,13 @@ namespace KS.NetTorch.Operations
     using System.Linq;
     using MathNet.Numerics.LinearAlgebra;
 
-    public sealed class MultiplyOperation : IGradientFunction
+    public sealed class PointwiseMultiplyOperation : IGradientFunction
     {
         private readonly Context _context;
 
         private readonly (IGradientFunction GF, int Int)[] _nextFunctions;
 
-        public MultiplyOperation(Context context)
+        public PointwiseMultiplyOperation(Context context)
         {
             _context = context;
             _nextFunctions = context
@@ -20,7 +20,7 @@ namespace KS.NetTorch.Operations
 
         public static Matrix<double> ExecuteForward(params Matrix<double>[] args)
         {
-            return args[0] * args[1];
+            return args[0].PointwiseMultiply(args[1]);
         }
 
         public void ExecuteBackward(Matrix<double> initialGradient)

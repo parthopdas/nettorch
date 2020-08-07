@@ -9,9 +9,10 @@ namespace KS.NetTorch.Tests
     public class TensorTestsBackPropagation
     {
         private static readonly Matrix<double> Zero1x1 = 0.0.ToMatrix();
+        private static readonly Matrix<double> Zero2x1 = new[] { 0d, 0 }.ToMatrix();
 
         [Fact]
-        public void BackPropagateOnMultiply2UserCreatedTensorsOneOfThemTracksGradient()
+        public void BackPropagateOnScalarMultiplyOneOfThemTracksGradient()
         {
             var a = new Tensor(2, tracksGradient: true);
             var b = new Tensor(3);
@@ -23,6 +24,21 @@ namespace KS.NetTorch.Tests
 
             a.Should().HaveProperties(2.ToMatrix(), 6.ToMatrix(), typeof(AccumulateGradientFunction), isLeaf: true, tracksGradient: true);
             b.Should().HaveProperties(3.ToMatrix(), Zero1x1, typeof(NullGradientFunction), isLeaf: true, tracksGradient: false);
+        }
+
+        [Fact]
+        public void BackPropagateOnTensorMultiplyOneOfThemTracksGradient()
+        {
+            var a = new Tensor(new[] { 2d, 4 }, tracksGradient: true);
+            var b = new Tensor(new[] { 7d, 11 });
+
+            var c = a * b;
+
+            c.Backward(new[] { 1d, 2.0 }.ToMatrix());
+
+
+            a.Should().HaveProperties(new[] { 2d, 4 }.ToMatrix(), new[] { 7d, 22 }.ToMatrix(), typeof(AccumulateGradientFunction), isLeaf: true, tracksGradient: true);
+            b.Should().HaveProperties(new[] { 7d, 11 }.ToMatrix(), Zero2x1, typeof(NullGradientFunction), isLeaf: true, tracksGradient: false);
         }
 
         [Fact]
@@ -40,8 +56,8 @@ namespace KS.NetTorch.Tests
             c.Backward(1.0);
             e.Backward();
 
-            e.Should().HaveProperties(24.ToMatrix(), Zero1x1, typeof(MultiplyOperation), isLeaf: false, tracksGradient: true);
-            c.Should().HaveProperties(6.ToMatrix(), Zero1x1, typeof(MultiplyOperation), isLeaf: false, tracksGradient: true);
+            e.Should().HaveProperties(24.ToMatrix(), Zero1x1, typeof(PointwiseMultiplyOperation), isLeaf: false, tracksGradient: true);
+            c.Should().HaveProperties(6.ToMatrix(), Zero1x1, typeof(PointwiseMultiplyOperation), isLeaf: false, tracksGradient: true);
             d.Should().HaveProperties(4.ToMatrix(), 6.ToMatrix(), typeof(AccumulateGradientFunction), isLeaf: true, tracksGradient: true);
             b.Should().HaveProperties(3.ToMatrix(), 10.ToMatrix(), typeof(AccumulateGradientFunction), isLeaf: true, tracksGradient: true);
             a.Should().HaveProperties(2.ToMatrix(), 15.ToMatrix(), typeof(AccumulateGradientFunction), isLeaf: true, tracksGradient: true);

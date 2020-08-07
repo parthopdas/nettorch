@@ -3,7 +3,6 @@ namespace KS.NetTorch.Tests
     using FluentAssertions;
     using KS.NetTorch.Operations;
     using KS.NetTorch.Tests.Extensions;
-    using MathNet.Numerics;
     using MathNet.Numerics.LinearAlgebra;
     using Xunit;
 
@@ -49,7 +48,7 @@ namespace KS.NetTorch.Tests
 
             var c = a * b;
 
-            c.Should().HaveProperties(6.ToMatrix(), Zero1x1, typeof(MultiplyOperation), isLeaf: false, tracksGradient: true);
+            c.Should().HaveProperties(6.ToMatrix(), Zero1x1, typeof(PointwiseMultiplyOperation), isLeaf: false, tracksGradient: true);
         }
     }
 }
