@@ -27,28 +27,9 @@ namespace KS.NetTorch.Tests
             var a = new Tensor(2, tracksGradient: true);
 
             a.Should().HaveProperties(2.ToMatrix(), Zero1x1, typeof(AccumulateGradientFunction), isLeaf: true, tracksGradient: true);
-        }
-
-        [Fact]
-        public void Multiply2UserCreatedTensorsThatDontTrackGradient()
-        {
-            var a = new Tensor(2);
-            var b = new Tensor(3);
-
-            var c = a * b;
-
-            c.Should().HaveProperties(6.ToMatrix(), Zero1x1, typeof(NullGradientFunction), isLeaf: true, tracksGradient: false);
-        }
-
-        [Fact]
-        public void Multiply2UserCreatedTensorsOneOfThemTracksGradient()
-        {
-            var a = new Tensor(2, tracksGradient: true);
-            var b = new Tensor(3);
-
-            var c = a * b;
-
-            c.Should().HaveProperties(6.ToMatrix(), Zero1x1, typeof(PointwiseMultiplyOperation), isLeaf: false, tracksGradient: true);
+            a.ToString().Should().Be(@"DenseMatrix 1x1-Double
+2
+");
         }
     }
 }

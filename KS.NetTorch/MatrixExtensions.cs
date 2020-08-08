@@ -1,5 +1,6 @@
 namespace KS.NetTorch
 {
+    using System;
     using MathNet.Numerics.LinearAlgebra;
 
     public static class MatrixExtensions

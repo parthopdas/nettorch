@@ -13,7 +13,14 @@ PyTorch style DNN Library
 ## TODO
 
 - Thermometer application from pytorch book
+- tests for individual operations
+- refactor out next function
+  - add does not need to save context
+- retain_graph=True after first backward
 - Unbind - to bring in action the 2nd parameter of the tuple.
 - complex example from youtube video
 - Enable graph to be GCed
-- numerical gradient
+- E2E
+  - MNIST
+  - RNN
+? numerical gradient

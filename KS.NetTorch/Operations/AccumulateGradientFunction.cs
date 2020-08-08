@@ -2,6 +2,7 @@ namespace KS.NetTorch.Operations
 {
     using MathNet.Numerics.LinearAlgebra;
 
+    // TODO: Align with pytorch semantics - show none for leaf tensors
     public sealed class AccumulateGradientFunction : IGradientFunction
     {
         private Tensor _tensor;

@@ -1,6 +1,5 @@
 namespace KS.NetTorch
 {
-    using System;
     using System.Diagnostics;
     using KS.NetTorch.Operations;
     using MathNet.Numerics.LinearAlgebra;
@@ -12,12 +11,14 @@ namespace KS.NetTorch
 
         public Matrix<double> Gradient { get; private set; }
 
-        public IGradientFunction GradientFunction { get; private set; }
+        // TODO: private setter
+        public IGradientFunction GradientFunction { get; set; }
 
-        public bool IsLeaf { get; private set; }
+        // TODO: private setter
+        public bool IsLeaf { get; set; }
 
-
-        public bool TracksGradient { get; private set; }
+        // TODO: private setter
+        public bool TracksGradient { get; set; }
 
         public Tensor(double data, bool tracksGradient = false)
             : this(data.ToMatrix(), tracksGradient)
@@ -64,28 +65,29 @@ namespace KS.NetTorch
 
         public static Tensor operator *(double d, Tensor t1)
         {
-            throw new NotImplementedException();
+            return t1 * d;
         }
 
         public static Tensor operator *(Tensor t1, double d)
         {
-            throw new NotImplementedException();
+            var t2 = new Tensor(Matrix<double>.Build.Dense(t1.Data.RowCount, t1.Data.ColumnCount, d));
+
+            return t1 * t2;
         }
 
         public static Tensor operator *(Tensor t1, Tensor t2)
         {
-            var tracksGradient = t1.TracksGradient || t2.TracksGradient;
+            return t1.PointwiseMultiply(t2);
+        }
 
-            var gradientFunction = tracksGradient
-                ? (IGradientFunction)new PointwiseMultiplyOperation(new Context().SaveForBackward(t1, t2))
-                : new NullGradientFunction();
+        public static Tensor operator +(Tensor t1, Tensor t2)
+        {
+            return t1.PointwiseAdd(t2);
+        }
 
-            return new Tensor(PointwiseMultiplyOperation.ExecuteForward(t1.Data, t2.Data))
-            {
-                IsLeaf = !tracksGradient,
-                TracksGradient = tracksGradient,
-                GradientFunction = gradientFunction,
-            };
+        public static Tensor operator -(Tensor t1, Tensor t2)
+        {
+            return t1.PointwiseSubtract(t2);
         }
     }
 }
