@@ -1,5 +1,6 @@
 namespace KS.NetTorch
 {
+    using System;
     using System.Diagnostics;
     using KS.NetTorch.Operations;
     using MathNet.Numerics.LinearAlgebra;
@@ -49,6 +50,16 @@ namespace KS.NetTorch
         public void AccumulateGradient_(Matrix<double> delta)
         {
             Gradient = Gradient.Add(delta);
+        }
+
+        public void ResetGradientToZero_()
+        {
+            Gradient = Matrix<double>.Build.Dense(Gradient.RowCount, Gradient.ColumnCount, 0);
+        }
+
+        public void ModifyData_(Func<Matrix<double>, Matrix<double>> f)
+        {
+            Data = f(Data);
         }
 
         public override string ToString() => Data.ToString();

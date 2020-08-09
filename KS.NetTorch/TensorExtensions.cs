@@ -1,6 +1,8 @@
 namespace KS.NetTorch
 {
+    using System;
     using KS.NetTorch.Operations;
+    using MathNet.Numerics.LinearAlgebra;
 
     public static class TensorExtensions
     {

@@ -18,9 +18,10 @@ namespace KS.NetTorch.Operations
                 .ToArray();
         }
 
-        public static Matrix<double> ExecuteForward(params Matrix<double>[] args)
+        public static Matrix<double> ExecuteForward(Matrix<double> m1, Matrix<double> m2)
         {
-            return args[0].PointwiseMultiply(args[1]);
+            var (m1b, m2b) = LibMatrixExtensions.Broadcast(m1, m2);
+            return m1b.PointwiseMultiply(m2b);
         }
 
         public void ExecuteBackward(Matrix<double> initialGradient)

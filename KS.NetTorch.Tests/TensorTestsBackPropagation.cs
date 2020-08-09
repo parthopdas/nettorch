@@ -6,7 +6,7 @@ namespace KS.NetTorch.Tests
     using MathNet.Numerics.LinearAlgebra;
     using Xunit;
 
-    public class TensorTestsBackPropagation
+    public sealed class TensorTestsBackPropagation
     {
         private static readonly Matrix<double> Zero1x1 = 0.0.ToMatrix();
         private static readonly Matrix<double> Zero2x1 = new[] { 0d, 0 }.ToMatrix();

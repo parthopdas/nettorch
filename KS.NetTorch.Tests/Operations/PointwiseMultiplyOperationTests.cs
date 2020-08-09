@@ -1,4 +1,4 @@
-﻿namespace KS.NetTorch.Tests.Operations
+namespace KS.NetTorch.Tests.Operations
 {
     using System.Collections.Generic;
     using Extensions;
@@ -43,23 +43,6 @@
                     (2.ToMatrix(), typeof(AccumulateGradientFunction), isLeaf: true, tracksGradient: true),
                     (Zero1x1, typeof(PointwiseMultiplyOperation), isLeaf: false, tracksGradient: true),
                 },
-
-                // Rhs boxing: Test with one gradient tracking
-                // new object[]
-                // {
-                //     (new[] {1d, 2d, }.ToMatrix(), false),
-                //     (new[] {3d, }.ToMatrix(), false),
-                //     new[] {3d, 6d, }.ToMatrix(),
-                //     (Zero1x1, typeof(NullGradientFunction), isLeaf: true, tracksGradient: false),
-                //     (Zero1x1, typeof(NullGradientFunction), isLeaf: true, tracksGradient: false),
-                //     (Zero1x1, typeof(NullGradientFunction), isLeaf: true, tracksGradient: false),
-                // },
-                // Rhs boxing: Test with both grad tracking
-                // Rhs boxing: Test with neither grad tracking
-
-                // Lhs boxing: Test with one gradient tracking
-                // Lhs boxing: Test with both grad tracking
-                // Lhs boxing: Test with neither grad tracking
             };
 
         [Theory]

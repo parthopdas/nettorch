@@ -6,7 +6,7 @@ namespace KS.NetTorch.Tests
     using MathNet.Numerics.LinearAlgebra;
     using Xunit;
 
-    public class TensorTestsBasics
+    public sealed class TensorTestsBasics
     {
         private static readonly Matrix<double> Zero1x1 = 0.0.ToMatrix();
 
